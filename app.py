@@ -1,5 +1,6 @@
 import py_avataaars
 import random, logging, sys
+import time
 import uvicorn
 
 from starlette.applications import Starlette
@@ -14,6 +15,7 @@ from json import loads, dumps
 from requests import get
 from os import getenv, urandom, path, environ
 from PIL import Image
+
 
 templates = Jinja2Templates(directory='templates')
 
@@ -152,8 +154,14 @@ def index(request):
 def headers(request):
     return JSONResponse(dumps({k:v for k, v in request.headers.items()}))
 
+def slow(request):
+    time.sleep(500)
+    return templates.TemplateResponse('index.txt', {'request': request})
+
+    
 routes = [
     Route('/', endpoint=index),
+    Route('/slow', endpoint=slow),
     Route('/headers', endpoint=headers),
     Mount('/static', app=StaticFiles(directory='static'), name='static'),
 ]
